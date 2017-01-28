@@ -8,8 +8,6 @@ This repository contains all catkin makefiles; to compile, in the catkin_ws dire
 ```
 catkin_make
 ```
-The source code is contained in
-> catkin_ws/src/aspire_tdi/src/
 
 Can be written in either C++ or Python, but let's maintain Python for now for consistency.
 
