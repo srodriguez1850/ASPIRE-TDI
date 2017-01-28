@@ -1,0 +1,24 @@
+# Task Delegation Interface for ASPIRE (UIUC)
+
+Updated: 25JAN17
+
+Tutorial to setup the ROS environment [here](http://wiki.ros.org/ROS/Tutorials/InstallingandConfiguringROSEnvironment), requires Ubuntu 16.04 (Xenial) for ROS Kinetic Kame.
+
+This repository contains all catkin makefiles; to compile, in the catkin_ws directory, run
+```
+catkin_make
+```
+The source code is contained in
+> catkin_ws/src/aspire_tdi/src/
+
+Can be written in either C++ or Python, but let's maintain Python for now for consistency.
+
+To start up ROS (in background beacuse it blocks), run
+```
+roscore &
+```
+To execute a node, run
+```
+rosrun aspire_tdi [node_name]      (C++)
+rosrun aspire_tdi [node_name].py   (Python)
+```
