@@ -7,7 +7,13 @@ from std_msgs.msg import String
 # Helper Functions
 # ----------------
 
-#def init_database():
+def init_database(file, db):
+	# Initialize a dictionary using I/O
+	f = open(file, 'r')
+	for line in f:
+		line = line.split('/')
+		db[line[0]] = [int(s) for s in line[1].split(',')]
+	f.close()
 
 # ------------------
 # Callback Functions
@@ -26,8 +32,16 @@ def hl_handler():
 	rospy.init_node('HL_manager', anonymous=False)
 
 	# Initialize database of High Level Tasks (Actions/Fixes/Interrupts)
-	A_db = {'bring_obj_to_user' : [0, 1, 2, 3]}
-	print A_db
+	# Declare dictionaries
+	A_db = {}
+	#F_db = {}
+	#I_db = {}
+
+	# Initialize dictionaries
+	init_database('actions.db', A_db)
+	#init_database('fixes.db', F_db)
+	#init_database('interrupts.db', I_db)
+
 
 	# Initialize Publisher topics (senders)
 	#toII_pub = rospy.Publisher('HLM_to_II', String, queue_size=10)
