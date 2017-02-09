@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
-from std_msgs.msg import String
+from aspire_tdi.srv import *
 
 # ----------------
 # Helper Functions
@@ -15,58 +15,46 @@ def init_database(file, db):
 		db[line[0]] = [int(s) for s in line[1].split(',')]
 	f.close()
 
-# ------------------
-# Callback Functions
-# ------------------
+# --------------
+# Node Functions
+# --------------
 
-def callback(data):
-	rospy.loginfo(rospy.get_caller_id() + ' HL: I heard %s', data.data)
+def handle_requestHLM(req):
+	# Main request handling, look up XT, and send a request to LLM
+	print 'HLM handling request.'
+	return 0
 
-# -----------
-# Node Source
-# -----------
+# requestHLM_server
+# Startup code for the HLM server. Takes inputs from II, requests the LLH, and returns completion code.
+def requestHLM_server():
 
-def hl_handler():
+	# Initialize node
+	rospy.init_node('requestHLM_server')
 
-	# Initialize the node with False parameter to reject duplicate nodes
-	rospy.init_node('HL_manager', anonymous=False)
-
-	# Initialize database of High Level Tasks (Actions/Fixes/Interrupts)
+	# Initialize database of High Level Tasks (Actions/Fixes)
 	# Declare dictionaries
 	A_db = {}
 	#F_db = {}
-	#I_db = {}
 
 	# Initialize dictionaries
 	init_database('actions.db', A_db)
 	#init_database('fixes.db', F_db)
-	#init_database('interrupts.db', I_db)
+	print 'A_db:'
+	print A_db
 
+	# Wait for LLH service to start so we don't hang
+	#rospy.wait_for_service('requestLLH')
 
-	# Initialize Publisher topics (senders)
-	#toII_pub = rospy.Publisher('HLM_to_II', String, queue_size=10)
-	toLLH_pub = rospy.Publisher('HLM_to_LLH', String, queue_size=10)
+	# Start HLM service
+	s = rospy.Service('requestHLM', requestHLM, handle_requestHLM)
+	print 'HLM ready to handle requests.'
 
-	# Initialize Subscriber topics (receivers)
-	rospy.Subscriber('LLH_to_HLM', String, callback)
-	#rospy.Subscriber('II_to_HLM', String, callback)
+	# Prevent exiting
+	rospy.spin()
 
-	# Initialize rate
-	rate = rospy.Rate(1)
-
-	# Run node
-	while not rospy.is_shutdown():
-		histr = 'Hi from HL'
-		#rospy.loginfo(histr)
-		toLLH_pub.publish(histr)
-		rate.sleep()
-
-# -----------------------
-# Main and Error Handling
-# -----------------------
+# ----
+# Main
+# ----
 
 if __name__ == '__main__':
-	try:
-		hl_handler()
-	except rospy.ROSInterruptException:
-		pass
+	requestHLM_server()

@@ -1,0 +1,7 @@
+cd ..
+cd ..
+cd ..
+catkin_make
+cd src
+cd aspire_tdi
+cd src
