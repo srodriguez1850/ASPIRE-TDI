@@ -21,12 +21,13 @@ def init_database(file, db):
 
 def handle_requestHLM(req):
 	# Main request handling, look up XT, and send a request to LLM
+	
 	print 'HLM handling request.'
 	return 0
 
-# requestHLM_server
-# Startup code for the HLM server. Takes inputs from II, requests the LLH, and returns completion code.
+
 def requestHLM_server():
+	# Startup code for the HLM server. Takes inputs from II, requests the LLH, and returns completion code.
 
 	# Initialize node
 	rospy.init_node('requestHLM_server')

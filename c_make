@@ -1,7 +1,4 @@
-cd ..
-cd ..
-cd ..
-catkin_make
-cd src
-cd aspire_tdi
-cd src
+cd ../../..
+catkin_make install
+cd -
+source ~/.bashrc
