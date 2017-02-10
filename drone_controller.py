@@ -15,6 +15,7 @@ from aspire_tdi.srv import *
 
 def handle_requestDC(req):
 	# Main request handling, take subtask, send it to the drones
+	# Talk to Naira's group, here is where we collaborate with them!
 	print 'DC handling request.'
 	return 0
 

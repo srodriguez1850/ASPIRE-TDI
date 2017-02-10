@@ -15,7 +15,7 @@ from aspire_tdi.srv import *
 
 def handle_requestLLH(req):
 	# Main request handling, take subtask, send it to the drones
-	
+	# Use sendTo_DC here!
 	print 'LLH handling request.'
 	return 0
 

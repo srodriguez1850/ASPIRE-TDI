@@ -21,10 +21,9 @@ def init_database(file, db):
 
 def handle_requestHLM(req):
 	# Main request handling, look up XT, and send a request to LLM
-	
+	# Use sendTo_LLH here!
 	print 'HLM handling request.'
 	return 0
-
 
 def requestHLM_server():
 	# Startup code for the HLM server. Takes inputs from II, requests the LLH, and returns completion code.
@@ -44,7 +43,9 @@ def requestHLM_server():
 	print A_db
 
 	# Wait for LLH service to start so we don't hang
-	#rospy.wait_for_service('requestLLH')
+	rospy.wait_for_service('requestLLH')
+	# Create a handle to request LLH
+	sendTo_LLH = rospy.ServiceProxy('requestLLH', requestLLH)
 
 	# Start HLM service
 	s = rospy.Service('requestHLM', requestHLM, handle_requestHLM)
