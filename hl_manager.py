@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import rospy
+import os, sys, rospy
 from aspire_tdi.srv import *
 
 # ----------------
@@ -9,7 +9,7 @@ from aspire_tdi.srv import *
 
 def init_database(file, db):
 	# Initialize a dictionary using I/O
-	f = open(file, 'r')
+	f = open(os.path.join(sys.path[0], file), 'r')
 	for line in f:
 		line = line.split('/')
 		db[line[0]] = [int(s) for s in line[1].split(',')]
@@ -39,8 +39,8 @@ def requestHLM_server():
 	# Initialize dictionaries
 	init_database('actions.db', A_db)
 	#init_database('fixes.db', F_db)
-	print 'A_db:'
-	print A_db
+	#print 'A_db:'
+	#print A_db
 
 	# Wait for LLH service to start so we don't hang
 	rospy.wait_for_service('requestLLH')
