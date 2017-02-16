@@ -38,3 +38,14 @@ def requestDC_server():
 
 if __name__ == '__main__':
 	requestDC_server()
+
+
+
+
+# Current requestDC.srv
+
+# string Subtask -> subtask ID to execute (a string for now)
+# ---
+# int64 StatusCode -> 0 for good, 1 for error
+
+# Consider adding an interrupt signal, to catch any preempting (may have to be received from Naira's)
