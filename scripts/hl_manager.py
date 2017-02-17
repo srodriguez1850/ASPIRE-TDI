@@ -25,11 +25,11 @@ def handle_requestHLM(req):
 	print 'HLM handling request.'
 	return 0
 
-def requestHLM_server():
+def HLM_server():
 	# Startup code for the HLM server. Takes inputs from II, requests the LLH, and returns completion code.
 
 	# Initialize node
-	rospy.init_node('requestHLM_server')
+	rospy.init_node('high_level_manager')
 
 	# Initialize database of High Level Tasks (Actions/Fixes)
 	# Declare and initialize dictionaries
@@ -66,7 +66,7 @@ def requestHLM_server():
 # ----
 
 if __name__ == '__main__':
-	requestHLM_server()
+	HLM_server()
 
 
 # Current requestHLM.srv

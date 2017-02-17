@@ -35,11 +35,11 @@ def handle_requestLLH(req):
 
 	return 0
 
-def requestLLH_server():
+def LLH_server():
 	# Startup code for the LLH server. Takes XT from HLM, determines tasks to request to the DC, and returns completion for the whole task.
 
 	# Initialize node
-	rospy.init_node('requestLLH_server')
+	rospy.init_node('low_level_handler')
 
 	# Initialize database of Subtasks
 	global S_db
@@ -71,7 +71,7 @@ def requestLLH_server():
 # ----
 
 if __name__ == '__main__':
-	requestLLH_server()
+	LLH_server()
 
 
 # Current requestLLH.srv

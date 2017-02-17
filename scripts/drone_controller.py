@@ -19,11 +19,11 @@ def handle_requestDC(req):
 	print 'DC handling request.'
 	return 0
 
-def requestDC_server():
+def DC_server():
 	# Startup code for the HLM server. Takes input from LLH, sends them to the drones, and returns completion per subtask.
 
 	# Initialize node
-	rospy.init_node('requestDC_server')
+	rospy.init_node('drone_controller')
 
 	# Start DC service
 	s = rospy.Service('requestDC', requestDC, handle_requestDC)
@@ -37,7 +37,7 @@ def requestDC_server():
 # ----
 
 if __name__ == '__main__':
-	requestDC_server()
+	DC_server()
 
 
 
