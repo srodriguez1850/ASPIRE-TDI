@@ -40,7 +40,7 @@ def client():
             else :
                 # send message
                 mesg = sys.stdin.readline()
-                server_socket.send(p_mesg)  
+                server_socket.send(mesg)  
                 
 
 if __name__ == "__main__":
