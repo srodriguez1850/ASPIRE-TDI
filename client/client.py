@@ -1,4 +1,4 @@
-import sys, socket, select, pickle
+import sys, socket, select
  
 def client():
     if(len(sys.argv) < 3) :
@@ -20,7 +20,6 @@ def client():
      
     socket_list = [sys.stdin, server_socket]
     while True:
-        sys.stdout.write('Me: ')
         sys.stdout.flush()
          
         # Get readable sockets
