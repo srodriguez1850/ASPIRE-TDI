@@ -23,6 +23,7 @@ def handle_requestHLM(req):
 	# Main request handling, look up XT, and send a request to LLM
 	# Use sendTo_LLH here!
 	print 'HLM handling request.'
+        print 'HLM received: ' + str(req)
 	return 0
 
 def HLM_server():
