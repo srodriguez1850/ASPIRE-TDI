@@ -6,7 +6,7 @@ except ImportError:
     # for Python3
     from tkinter import Tk, Label, Button
 
-class MyFirstGUI:
+class clientGUI:
     def __init__(self, master, server_socket):
         self.master = master
         self.server = server_socket
@@ -40,10 +40,12 @@ def client():
      
     print('Connected :)')
 
+    # Runs GUI(currently only sending fixed message)
     root = Tk()
-    my_gui = MyFirstGUI(root, server_socket)
+    my_gui = clientGUI(root, server_socket)
     root.mainloop()
      
+    # To enable receiving messages at the same time as GUI, might need to integrate these two parts of code together
     socket_list = [sys.stdin, server_socket]
     while True:
         sys.stdout.flush()
