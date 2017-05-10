@@ -19,7 +19,7 @@ class clientGUI:
         self.greet_button.pack()
 
     def sendCommand(self):
-        self.server.send(b"bring_obj_to_user")
+        self.server.send(b"cmd:move_to_position_debug/nargs:3/arg1:0.0/arg2:0.0/arg3:0.0")
 
  
 def client():
@@ -32,9 +32,14 @@ def client():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
      
     # connect to host
-    try :
+    try:
         server_socket.connect((host, port))
-    except :
+        server_socket.send("SYN\n")
+        if server_socket.recv(4096).strip() != "SYN_ACK":
+            raise Exception('No SYN_ACK')
+        server_socket.send("ACK\n")
+
+    except:
         print('Failed to connect :(')
         sys.exit()
      
