@@ -13,11 +13,11 @@ import socket, select
 # ----------------
 def handshake(conn):
 	rospy.logdebug('Shaking hand')
-	buf_in = conn.recv(BUFFER_LEN).strip()
+	buf_in = conn.recv(tdi_constants.BUFFER_LEN).strip()
 	if buf_in == 'SYN':
 		conn.send('SYN_ACK\n')
 		rospy.logdebug('Received SYN, sent SYN_ACK')
-		buf_in = conn.recv(BUFFER_LEN).strip()
+		buf_in = conn.recv(tdi_constants.BUFFER_LEN).strip()
 		if buf_in == 'ACK':
 			rospy.loginfo('Connection with client established')
 			return True
@@ -65,7 +65,7 @@ def input_interpreter():
 				continue
 			while True:
 			#start receiving data
-				data = connection.recv(BUFFER_LEN)
+				data = connection.recv(tdi_constants.BUFFER_LEN)
 				if data:
 					#deal with data(parse and store it) here
 					rospy.logdebug('Received from client: ' + str(data.strip()))
@@ -77,8 +77,11 @@ def input_interpreter():
 				else:
 					rospy.logwarn(str(client_address) + ' connection terminated: No more data')
 					break
-		except:
+		except Exception as e:
 			rospy.logerr(str(client_address) + ' connection interrupted: Exception thrown')
+			rospy.logerr(e)
+			if (type(e) is KeyboardInterrupt):
+				sys.exit()
 		finally:
 			connection.shutdown(socket.SHUT_RDWR)
 			connection.close()

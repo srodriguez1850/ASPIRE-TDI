@@ -5,6 +5,7 @@ import tdi_constants
 import os
 import sys
 from aspire_tdi.srv import *
+from crazyflie_demo.srv import tdiBridge
 
 
 # ----------------
@@ -15,9 +16,17 @@ def send_command_to_bridge(cmd, args):
 	# move_to_location has 3 arguments
 	if (cmd == 'move_to_location' and len(args) == 3):
 		return sendTo_ASPIRE(1, args).RespCode
+	elif (cmd == 'move_to_home' and len(args) == 0):
+		return sendTo_ASPIRE(1, strlist(tdi_constants.HOME_COORD)).RespCode
 	else:
 		rospy.logerr('Unrecognized command, not sent to bridge')
 		return 1
+
+def strlist(list):
+	out = []
+	for e in list:
+		out.append(str(e))
+	return out
 
 # --------------
 # Node Functions
@@ -28,9 +37,6 @@ def handle_requestDC(req):
 	# Talk to Naira's group, here is where we collaborate with them!
 	rospy.loginfo('DC handling request')
 	rospy.logdebug(str(req))
-	# REMOVE THIS LINE AFTER CONNECTING TO VICON
-	return 0
-	# REMOVE THIS LINE AFTER CONNECTING TO VICON
 	return send_command_to_bridge(req.Subtask, req.Args)
 
 def DC_server():
@@ -39,13 +45,11 @@ def DC_server():
 	# Initialize node
 	rospy.init_node('drone_controller', log_level=tdi_constants.ROSPY_LOG_LEVEL)
 
-	#Wait for DC service to start so we don't hang
-	# print 'waiting for aspire'
-	# rospy.wait_for_service('/crazyflie/aspire')
-	# print 'aspire started'
-	# # Create a handle to requestDC
-	# global sendTo_ASPIRE
-	# sendTo_ASPIRE = rospy.ServiceProxy('/crazyflie/aspire', aspire)
+	#Wait for  service to start so we don't hang
+	rospy.wait_for_service('/crazyflie/tdiBridge')
+	# Create a handle to requestDC
+	global sendTo_ASPIRE
+	sendTo_ASPIRE = rospy.ServiceProxy('/crazyflie/tdiBridge', tdiBridge)
 
 	# Start DC service
 	s = rospy.Service('requestDC', requestDC, handle_requestDC)
