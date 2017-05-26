@@ -1,4 +1,0 @@
-cd ../../..
-catkin_make install
-cd -
-source ~/.bashrc

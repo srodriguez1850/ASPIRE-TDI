@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
 import rospy
-import tdi_constants
+import tdi_options
 import os
 import sys
 from aspire_tdi.srv import *
-from crazyflie_demo.srv import tdiBridge
+#from crazyflie_demo.srv import tdiBridge
 
 
 # ----------------
