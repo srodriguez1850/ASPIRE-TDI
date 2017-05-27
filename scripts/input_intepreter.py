@@ -4,6 +4,7 @@ import rospy
 import tdi_options
 import os
 import sys
+import thread
 from aspire_tdi.srv import *
 
 import socket, select
@@ -13,11 +14,11 @@ import socket, select
 # ----------------
 def handshake(conn):
 	rospy.logdebug('Shaking hand')
-	buf_in = conn.recv(tdi_constants.BUFFER_LEN).strip()
+	buf_in = conn.recv(tdi_options.BUFFER_LEN).strip()
 	if buf_in == 'SYN':
 		conn.send('SYN_ACK\n')
 		rospy.logdebug('Received SYN, sent SYN_ACK')
-		buf_in = conn.recv(tdi_constants.BUFFER_LEN).strip()
+		buf_in = conn.recv(tdi_options.BUFFER_LEN).strip()
 		if buf_in == 'ACK':
 			rospy.loginfo('Connection with client established')
 			return True
@@ -25,6 +26,11 @@ def handshake(conn):
 			return False
 	else:
 		return False
+
+def spawn_thread(data):
+	rospy.logdebug('Spawning thread')
+	sendTo_HLM(data.strip())
+	rospy.logdebug('Ending thread')
 
 # --------------
 # Node Functions
@@ -34,7 +40,7 @@ def input_interpreter():
 	# Startup code for I2. Receives input from the world, passes it into HLM.
 
 	# Initialize node
-	rospy.init_node('input_interpreter', log_level=tdi_constants.ROSPY_LOG_LEVEL)
+	rospy.init_node('input_interpreter', log_level=tdi_options.ROSPY_LOG_LEVEL)
 
 	# Wait for LLH service to start so we don't hang
 	rospy.wait_for_service('requestHLM')
@@ -42,7 +48,7 @@ def input_interpreter():
 	global sendTo_HLM
 	sendTo_HLM = rospy.ServiceProxy('requestHLM', requestHLM)
 
-	if tdi_constants.ENABLE_CONSOLE_INPUT:
+	if tdi_options.ENABLE_CONSOLE_INPUT:
 		while True:
 			cmdin = str(raw_input('CONSOLE_INPUT_TO_TDI: '))
 			if cmdin == '':
@@ -53,9 +59,9 @@ def input_interpreter():
 	# Set up server socket to receive request from client device
 	server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-	server_socket.bind((tdi_constants.HOST, tdi_constants.PORT))
+	server_socket.bind((tdi_options.HOST, tdi_options.PORT))
 	server_socket.listen(1)
-	rospy.loginfo('Server started on port ' + str(tdi_constants.PORT))
+	rospy.loginfo('Server started on port ' + str(tdi_options.PORT))
 	while True:
 		#accept one connect
 		connection, client_address = server_socket.accept()
@@ -65,7 +71,7 @@ def input_interpreter():
 				continue
 			while True:
 			#start receiving data
-				data = connection.recv(tdi_constants.BUFFER_LEN)
+				data = connection.recv(tdi_options.BUFFER_LEN)
 				if data:
 					#deal with data(parse and store it) here
 					rospy.logdebug('Received from client: ' + str(data.strip()))
@@ -73,7 +79,12 @@ def input_interpreter():
 					#print world_data,
 					rospy.logdebug('Sending ACK')
 					connection.send("ACK\n")
-					sendTo_HLM(data.strip())
+					#sendTo_HLM(data.strip())
+					try:
+						thread.start_new_thread(spawn_thread, (data, ))
+					except Exception as e:
+						rospy.logerr('Unable to start thread')
+						rospy.logerr(e)
 				else:
 					rospy.logwarn(str(client_address) + ' connection terminated: No more data')
 					break

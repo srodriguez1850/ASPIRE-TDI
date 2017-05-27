@@ -37,19 +37,22 @@ def handle_requestDC(req):
 	# Talk to Naira's group, here is where we collaborate with them!
 	rospy.loginfo('DC handling request')
 	rospy.logdebug(str(req))
+
+	return 0
+	
 	return send_command_to_bridge(req.Subtask, req.Args)
 
 def DC_server():
 	# Startup code for the HLM server. Takes input from LLH, sends them to the drones, and returns completion per subtask.
 
 	# Initialize node
-	rospy.init_node('drone_controller', log_level=tdi_constants.ROSPY_LOG_LEVEL)
+	rospy.init_node('drone_controller', log_level=tdi_options.ROSPY_LOG_LEVEL)
 
 	#Wait for  service to start so we don't hang
-	rospy.wait_for_service('/crazyflie/tdiBridge')
+	#rospy.wait_for_service('/crazyflie/tdiBridge')
 	# Create a handle to requestDC
-	global sendTo_ASPIRE
-	sendTo_ASPIRE = rospy.ServiceProxy('/crazyflie/tdiBridge', tdiBridge)
+	#global sendTo_ASPIRE
+	#sendTo_ASPIRE = rospy.ServiceProxy('/crazyflie/tdiBridge', tdiBridge)
 
 	# Start DC service
 	s = rospy.Service('requestDC', requestDC, handle_requestDC)

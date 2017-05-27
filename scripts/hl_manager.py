@@ -57,7 +57,7 @@ def HLM_server():
 	# Startup code for the HLM server. Takes inputs from II, requests the LLH, and returns completion code.
 
 	# Initialize node
-	rospy.init_node('high_level_manager', log_level=tdi_constants.ROSPY_LOG_LEVEL)
+	rospy.init_node('high_level_manager', log_level=tdi_options.ROSPY_LOG_LEVEL)
 
 	# Initialize database of High Level Tasks (Actions/Fixes)
 	# Declare and initialize dictionaries

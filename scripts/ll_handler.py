@@ -53,7 +53,7 @@ def LLH_server():
 	# Startup code for the LLH server. Takes XT from HLM, determines tasks to request to the DC, and returns completion for the whole task.
 
 	# Initialize node
-	rospy.init_node('low_level_handler', log_level=tdi_constants.ROSPY_LOG_LEVEL)
+	rospy.init_node('low_level_handler', log_level=tdi_options.ROSPY_LOG_LEVEL)
 
 	# Initialize database of Subtasks
 	global S_db
