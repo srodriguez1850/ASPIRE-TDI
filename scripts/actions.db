@@ -1,2 +1,3 @@
-return_home/1
-move_to_position_debug/0
+task_kill/0
+return_home/2
+move_to_position_debug/1

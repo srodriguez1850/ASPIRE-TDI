@@ -14,7 +14,10 @@ from aspire_tdi.srv import *
 
 def send_command_to_bridge(cmd, args):
 	# move_to_location has 3 arguments
-	if (cmd == 'move_to_location' and len(args) == 3):
+	if (cmd == 'kill' and len(args) == 2):
+		#return sendTo_ASPIRE(1, args).RespCode
+		return 0
+	elif (cmd == 'move_to_location' and len(args) == 3):
 		return sendTo_ASPIRE(1, args).RespCode
 	elif (cmd == 'move_to_home' and len(args) == 0):
 		return sendTo_ASPIRE(1, strlist(tdi_constants.HOME_COORD)).RespCode

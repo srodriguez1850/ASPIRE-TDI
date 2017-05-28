@@ -1,16 +1,23 @@
 import rospy
 
-# -----------
-# Definitions
-# -----------
-HOST = '' 
-sockets = []
-BUFFER_LEN = 4096 
-PORT = 4000
-
 # -------
 # Options
 # -------
+
+# Debugging
 ENABLE_CONSOLE_INPUT = 0
 ROSPY_LOG_LEVEL = rospy.DEBUG
+
+# Localization
 HOME_COORD = [0.0, 0.0, 0.5]
+
+# Networking
+HOST = ''
+SOCKETS = []
+BUFFER_LEN = 4096
+PORT = 4000
+MAX_CLIENTS = 2
+SYN_STR_FROM_CLIENT = 'ASPIREv0.1.0-SYN'
+SYNACK_STR_TO_CLIENT = 'ASPIRE_TDI-SYNACK\n'
+ACK_STR_FROM_CLIENT = 'ASPIREv0.1.0-ACK'
+ACTN_ACK_STR_TO_CLIENT = 'ASPIRE-ACTNACK\n'

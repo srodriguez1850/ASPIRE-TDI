@@ -4,6 +4,6 @@
 		<node pkg='aspire_tdi' name='drone_controller' type='drone_controller.py' output='screen'/>
 		<node pkg='aspire_tdi' name='ll_handler' type='ll_handler.py' output='screen'/>
 		<node pkg='aspire_tdi' name='hl_manager' type='hl_manager.py' output='screen'/>
-		<node pkg='aspire_tdi' name='input_interpreter' type='input_intepreter.py' output='screen'/>
+		<node pkg='aspire_tdi' name='tdi_master' type='tdi_master.py' output='screen'/>
 	</group>
 </launch>
