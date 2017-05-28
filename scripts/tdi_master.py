@@ -5,13 +5,79 @@ import tdi_options
 import os
 import sys
 import thread
+
+from Queue import *
 from aspire_tdi.srv import *
 
 import socket, select
 
+# -------
+# Classes
+# -------
+class master_info:
+	def __init__(self):
+		self.master_queue = Queue()
+		self.connections = []
+		self.addresses = []
+
+	def add_request(self, r_in, conn, addr):
+		d = self.format_request(r_in)
+		d['conn_obj'] = conn
+		d['conn_addr'] = addr
+		rospy.logdebug('Adding request to master: ' + str(d))
+		self.put_request(d)
+		rospy.logdebug('Sending ACK to ' + str(addr))
+		conn.send(tdi_options.ACTN_ACK_STR_TO_CLIENT)
+
+	def format_request(self, r_in):
+		d = {}
+		d['raw_request'] = r_in.strip()
+		for i in r_in.strip().split('/'):
+			v = i.split(':')
+			d[v[0]] = v[1]
+		return d
+
+	def put_request(self, d_in):
+		self.master_queue.put(d_in)
+
+	def get_request(self):
+		rospy.logdebug('Retrieving request')
+		return self.master_queue.get()
+
+	def print_queue(self):
+		for item in self.master_queue:
+			print item
+
+	def do_requests(self):
+		while True:
+			while not self.master_queue.empty():
+				curr_request = self.get_request()
+				rospy.logdebug('^ ' + str(curr_request))
+				rospy.logdebug('Handling request')
+				resp = sendTo_HLM(curr_request['raw_request'])
+				rospy.logdebug('Response: ' + str(resp.RespCode))
+				rospy.logdebug('Requests remaining: ' + str(self.master_queue.qsize()))
+		rospy.logerr('Request handler stopped unexpectedly')
+
+	def broadcast_info(self):
+		for conn in self.connections:
+			pass
+
+	def run_requests(self):
+		rospy.loginfo('Starting master request runner')
+		thread.start_new_thread(self.do_requests, ())
+
 # ----------------
 # Helper Functions
 # ----------------
+def print_tdi_options():
+	if tdi_options.ENABLE_CONSOLE_INPUT:
+		rospy.logwarn('ENABLE_CONSOLE_INPUT is enabled')
+	if tdi_options.DISABLE_TDI_BRIDGE:
+		rospy.logwarn('TdiBridge service is disabled')
+		if tdi_options.DELAY_ACTION:
+			rospy.logwarn('DELAY_ACTION is enabled, ' + str(tdi_options.DELAY_ACTION_AMOUNT) + ' second delay')
+
 def handshake(conn, addr):
 	rospy.logdebug('Shaking hands with ' + str(addr))
 	buf_in = conn.recv(tdi_options.BUFFER_LEN).strip()
@@ -21,6 +87,8 @@ def handshake(conn, addr):
 		buf_in = conn.recv(tdi_options.BUFFER_LEN).strip()
 		if buf_in == tdi_options.ACK_STR_FROM_CLIENT:
 			rospy.loginfo('Connection with ' + str(addr) + ' established')
+			master.connections.append(conn)
+			master.addresses.append(addr)
 			return True
 		else:
 			return False
@@ -41,11 +109,7 @@ def handle_client(conn, addr):
 		data = conn.recv(buf)
 		if data:
 			rospy.logdebug('Received from ' + str(addr) + ': ' + str(data.strip()))
-			#c_data = data.strip().split("/")
-			#print c_data,
-			rospy.logdebug('Sending ACK to ' + str(addr))
-			conn.send(tdi_options.ACTN_ACK_STR_TO_CLIENT)
-			sendTo_HLM(data.strip())
+			master.add_request(data, conn, addr)
 		else:
 			rospy.logwarn(str(addr) + ' connection terminated: No more data')
 			conn.shutdown(socket.SHUT_RDWR)
@@ -61,7 +125,14 @@ def tdi_master():
 	# Startup code for Master. Receives input from the world, passes it into HLM.
 
 	# Initialize node
-	rospy.init_node('input_interpreter', log_level=tdi_options.ROSPY_LOG_LEVEL)
+	rospy.init_node('tdi_master', log_level=tdi_options.ROSPY_LOG_LEVEL)
+	# Print options so we know
+	print_tdi_options()
+
+	# Initialize master, start new thread to run requests
+	global master
+	master = master_info()
+	master.run_requests()
 
 	# Wait for LLH service to start so we don't hang
 	rospy.wait_for_service('requestHLM')
@@ -74,6 +145,8 @@ def tdi_master():
 			cmdin = str(raw_input('CONSOLE_INPUT_TO_TDI: '))
 			if cmdin == '':
 				sendTo_HLM('cmd:move_to_position_debug/nargs:3/arg1:0.0/arg2:0.0/arg3:0.0')
+			elif cmdin == 'show_queue':
+				master.print_queue()
 			else:
 				sendTo_HLM(cmdin)
 

@@ -4,6 +4,8 @@ import rospy
 import tdi_options
 import os
 import sys
+import time
+
 from aspire_tdi.srv import *
 #from crazyflie_demo.srv import tdiBridge
 
@@ -13,6 +15,12 @@ from aspire_tdi.srv import *
 # ----------------
 
 def send_command_to_bridge(cmd, args):
+	if tdi_options.DISABLE_TDI_BRIDGE:
+		if tdi_options.DELAY_ACTION != 0:
+			rospy.logdebug('Adding delay')
+			time.sleep(tdi_options.DELAY_ACTION_AMOUNT)
+		return 0
+
 	# move_to_location has 3 arguments
 	if (cmd == 'kill' and len(args) == 2):
 		#return sendTo_ASPIRE(1, args).RespCode
@@ -40,9 +48,6 @@ def handle_requestDC(req):
 	# Talk to Naira's group, here is where we collaborate with them!
 	rospy.loginfo('DC handling request')
 	rospy.logdebug(str(req))
-
-	return 0
-	
 	return send_command_to_bridge(req.Subtask, req.Args)
 
 def DC_server():
@@ -52,10 +57,11 @@ def DC_server():
 	rospy.init_node('drone_controller', log_level=tdi_options.ROSPY_LOG_LEVEL)
 
 	#Wait for  service to start so we don't hang
-	#rospy.wait_for_service('/crazyflie/tdiBridge')
-	# Create a handle to requestDC
-	#global sendTo_ASPIRE
-	#sendTo_ASPIRE = rospy.ServiceProxy('/crazyflie/tdiBridge', tdiBridge)
+	global sendTo_ASPIRE
+	if not tdi_options.DISABLE_TDI_BRIDGE:
+		rospy.wait_for_service('/crazyflie/tdiBridge')
+		# Create a handle to requestDC
+		sendTo_ASPIRE = rospy.ServiceProxy('/crazyflie/tdiBridge', tdiBridge)
 
 	# Start DC service
 	s = rospy.Service('requestDC', requestDC, handle_requestDC)

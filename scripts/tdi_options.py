@@ -7,6 +7,9 @@ import rospy
 # Debugging
 ENABLE_CONSOLE_INPUT = 0
 ROSPY_LOG_LEVEL = rospy.DEBUG
+DISABLE_TDI_BRIDGE = 1
+DELAY_ACTION = 1
+DELAY_ACTION_AMOUNT = 3 # in seconds
 
 # Localization
 HOME_COORD = [0.0, 0.0, 0.5]
