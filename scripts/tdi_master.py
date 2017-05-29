@@ -14,11 +14,10 @@ import socket, select
 # -------
 # Classes
 # -------
-class master_info:
+class tdi_info:
 	def __init__(self):
 		self.master_queue = Queue()
-		self.connections = []
-		self.addresses = []
+		self.devices_connected = []
 
 	def add_request(self, r_in, conn, addr):
 		d = self.format_request(r_in)
@@ -57,11 +56,33 @@ class master_info:
 				resp = sendTo_HLM(curr_request['raw_request'])
 				rospy.logdebug('Response: ' + str(resp.RespCode))
 				rospy.logdebug('Requests remaining: ' + str(self.master_queue.qsize()))
+				self.broadcast_info()
 		rospy.logerr('Request handler stopped unexpectedly')
 
 	def broadcast_info(self):
-		for conn in self.connections:
-			pass
+		queue_str = 'MASTER_QUEUE=' + str(self.master_queue.qsize()) + '/'
+		for req in list(self.master_queue.queue):
+			queue_str += req['cmd'] + '/'
+		rospy.logdebug(queue_str)
+		queue_str += '\n'
+
+		for d in self.devices_connected:
+			rospy.logdebug('Broadcasting master queue to ' + str(d['conn_addr']))
+			#d['conn_obj'].send(queue_str)
+
+	def broadcast_devices(self):
+		devices_str = 'DEVICES=' + str(len(self.devices_connected)) + '/'
+		for d in devices_connected:
+			devices_str += d['device_name'] + '|'
+			devices_str += d['device_type'] + '|'
+			devices_str += d['device_model'] + '|'
+		rospy.logdebug(devices_str)
+		devices_str += '\n'
+
+		for d in devices_connected:
+			rospy.logdebug('Broadcasting devices to ' + str(d['conn_addr']))
+			#d['conn_obj'].send(devices_str)
+
 
 	def run_requests(self):
 		rospy.loginfo('Starting master request runner')
@@ -87,8 +108,16 @@ def handshake(conn, addr):
 		buf_in = conn.recv(tdi_options.BUFFER_LEN).strip()
 		if buf_in == tdi_options.ACK_STR_FROM_CLIENT:
 			rospy.loginfo('Connection with ' + str(addr) + ' established')
-			master.connections.append(conn)
-			master.addresses.append(addr)
+			device = {}
+			#device['device_name']
+			#device['device_type']
+			#device['device_model']
+			#device['device_uuid']
+			#device['os']
+			#device['os_version']
+			device['conn_obj'] = conn
+			device['conn_addr'] = addr
+			master.devices_connected.append(device)
 			return True
 		else:
 			return False
@@ -131,7 +160,7 @@ def tdi_master():
 
 	# Initialize master, start new thread to run requests
 	global master
-	master = master_info()
+	master = tdi_info()
 	master.run_requests()
 
 	# Wait for LLH service to start so we don't hang
@@ -173,6 +202,3 @@ def tdi_master():
 
 if __name__ == '__main__':
 	tdi_master()
-
-
-# Queue should be here to implement queueing actions
